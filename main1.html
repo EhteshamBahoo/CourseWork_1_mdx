@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div id="app">
+        <div class="container">
+            <header>
+                <h1 v-text="sitename" class="p-5" href="main.html"></h1>
+                <button :disabled="cart.length===0" v-on:click='showCheckout' class="btn btn-primary mb-3" >
+                    {{cartItemCount}}
+                    <i class="fa-solid fa-cart-plus me-1"></i>{{showProduct ? " Checkout" : " Activities" }} 
+                </button>
+            </header>
+            <div class="container mt-5">
+                <div v-if="showProduct">
+                    <div class="still">
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" value="Ascending" type="radio" id="ascending"
+                                v-model="lowHigh" />
+                            <label class="form-check-label" for="ascending">Ascending</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" value="Descending" type="radio" id="descending"
+                                v-model="lowHigh" />
+                            <label class="form-check-label" for="descending">Descending</label>
+                        </div>
+                    </div>
+                    <div class="row pt-5">
+                       <!-- <h3>After School Club</h3>-->
+                        <div class="col-lg-2">
+                            <!--j-->
+                        </div>  
+                    </div>
+                    <div class="col-lg-10">
+                        <form class="form-a">
+                            <div class="row">
+                                <div class="col-md-8 mb-2">
+                                    <div class="form-group">
+                                        <input type="text" v-model="searchInput" placeholder="Search"
+                                         class="form-control p-2 ps-3 rounded-0 shadow-0 form-control-lg form-control-a">
+      
+                                    </div>
+                                </div>
+                               
+      
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-group">
+                                    <select name="sortBy" v-model="sortBy"
+                                        class="form-control p-2 bg-white ps-3 form-select rounded-0 shadow-0 form-control-a form-control-lg">
+                                        <option>--Sort By--</option>
+                                        <option value="price">Price</option>
+                                        <option value="location">Location</option>
+                                        <option value="avalibility">Avalibility</option>
+                                        <option value="subject">Subject</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="product-list">
+                            <div class="row" style="display: flex; flex-wrap: wrap;">
+                                <div v-for="subject in filterLessons()" class="container border border-primary" style="width:25%; padding:20px; margin:20px;" >
+                                    <div>
+                                        <div class="card-img text-center p-2 bg-dark-white">
+                                            <img v-bind:src="subject.image" alt="" width="100" height="100">
+                                        </div>
+                                        <div class="card-body px-0 py-2">
+                                            <h5 class="mb-0" v-text="subject.title"></h5>
+                                            <p class="mb-0" v-text="subject.location"></p>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <p class="mb-0 "><small class="text-black-50">Price:</small>
+                                                        <strong>${{subject.price}}</strong>
+                                                    </p>
+                                                    <small class="text-black-50">Spaces {{subject.availableInventory > 0 ?
+                                                subject.availableInventory : "Out of Stock"}}</small>
+                                                </div>
+                                                <div>
+                                                    <button type="button" class="btn btn-primary"
+                                                        v-on:click="addToCart(subject)" :disabled="subject.availableInventory < 1">Add to cart</button>
+                                                </div>
+                                            </div>
+                                        </div>
+      
+                                    </div>
+                                </div>
+                                <div v-if="filterLessons() == ''">                                                              
+                                <div class="text-center mt-4">
+                                    <img src="img/zero.png" alt="" width="160" height="160">
+                                    <p class="mt-2">Cannot find <strong>{{searchInput}}</strong></p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div v-else>
+                <div class="container">
+                                          <!--2nd try-->
+                    <div class="row">
+                    <div class="col-lg-6">
+
+                        <div class="col-md-8 order-md-1">
+                            <h4 class="mb-3">Billing address</h4>
+                            <form class="needs-validation" novalidate>
+                                <div class="row">
+                                    <div class="mb-3">
+                                        <label for="firstName">First name</label>
+                                        <input type="letters" class="form-control" id="firstName" placeholder="" v-model.trim="order.firstname" value="" required>
+                                        <div class="invalid-feedback">
+                                            Valid first name is required.
+                                        </div>
+                                    </div>
+                             <!--       <div class="col-md-6 mb-3">
+                                        <label for="lastName">Last name</label>
+                                        <input type="text" class="form-control" id="lastName" v-model="order.lastname" placeholder="" value="" required>
+                                        <div class="invalid-feedback">
+                                            Valid last name is required.
+                                        </div>
+                                    </div>-->
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address">phoneNumber</label>
+                                    <input type="number" class="form-control" id="phoneNumber" placeholder="" v-model="order.phoneNumber" required>
+                                    <div class="invalid-feedback">
+                                        Please enter your Phone Number.
+                                    </div>
+                                </div>
+
+                
+                                    </div>
+
+                                </div>
+                                <hr class="mb-4">
+                                    
+                                <hr class="mb-4">
+
+                                <!-- <h4 class="mb-3">Payment</h4> -->
+                                
+                                <hr class="mb-4">
+                                <button class="btn btn-primary btn-lg btn-block" v-on:click="submitForm" type="submit">Continue to checkout
+
+
+                                </button>
+                            </form>
+                        </div>
+                        </div>
+                        <div class="col-lg-6">
+                        <div v-for="subject in checkOut()" class="col-lg-12 p-2">
+                            <div class="p-2 border ">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="mt-2">
+                                        <h4 v-text="subject.title"></h4>
+                                        <div class="mt-4">
+                                            <h5 class=" mb-0" v-text="subject.location"></h5>
+                                            <p class="mb-0">Price: ${{subject.price}}</p>
+                                            <p>Spaces: {{subject.availableInventory}}</p>
+                                            <button class="btn btn-danger"
+                                                v-on:click="removeCartItem(subject.id)"><small>Remove</small></button>
+                                        </div>
+                                    </div>
+                                    <div class="image">
+                                        <figure class="mb-0">
+                                            <img v-bind:src="subject.image" alt="" width="120" height="140">
+                                        </figure>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="checkOut() == ''">
+                            <div class="text-center mt-4">
+                                <!--the one on the checkout page--> 
+                                <img src="img/zero.png" alt="" width="160" height="160">
+                                <p class="mt-2"><strong>Cart Empty</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    
+    
+<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript">
+    var webstore = new Vue({
+        // The OPTION OBJECT: DOM Mounting Point
+        el: '#app',
+            data: { //The data option
+                // the key'sitename' mtches the value of v-text in the html
+                sitename: 'After School Club',
+                showProduct: true, 
+                lowHigh: 'Ascending',
+                subjects: mySub,
+                cart: [],
+                searchInput: '',
+                sortBy: '--Sort By--',
+                method: 'Home',
+                
+
+                // product: {
+                //     id: 1001,
+                //     title: 'Math',
+                //     description: "london",
+                //     price: 100,
+                //     image: "image/math.jpeg",
+                //     availableInventory: 10,
+                //     rating:3
+                // },
+                order: {
+                    firstname: '',
+                    lastname: '',
+                    address: '',
+                    phoneNumber: '',
+                },
+                states: {
+                    AL: 'Alabama',
+                    AR: 'Arizona',
+                    CA: 'Califonia',
+                    NV: 'Neveda'
+                },
+                cart: [] // array to store items in shopping cart
+            },
+            methods: {
+                showCheckout() {
+                    // console.log(this.showProduct);
+                    this.showProduct = this.showProduct ? false : true;
+                },
+                addToCart(subject) {
+                       this.cart.includes(subject) ? "" : this.cart.push(subject)
+                       subject.availableInventory -= 1
+                       console.log(this.cart)
+                },
+                checkOut() {
+                       let show = this.cart
+                       return show
+                   },
+                   submitForm() {
+                        const letters = /^[A-Za-z]+$/;
+                        const numbers = /^[0-9]+$/;
+                        let valid = true
+                        if (this.order.firstname.match(letters) == null) {
+                            valid = false
+                        }
+                        if (this.order.phoneNumber.match(numbers) == null) {
+                            valid = false
+                        }
+                        if (valid) {
+                            alert('Order submitted!')
+                            return true
+                        } else {
+                            return false
+                        }
+                },
+                removeCartItem(id) {
+                       let showcart = this.cart
+                       let less = this.subjects
+                       for (let i = 0; i < showcart.length; i++) {
+                           console.log(showcart[i].id)
+                           if (id == showcart[i].id) {
+                               showcart.splice(i, 1)
+   
+                           }
+                       }
+                       for (let i = 0; i < this.subjects.length; i++) {
+                           console.log(this.subjects[i].id)
+                           if (id == this.subjects[i].id) {
+                            this.subjects[i].availableInventory += 1
+   
+                           }
+                       }
+                   },
+                   cartCount(id) {
+                       let count = 0
+                       for (let i = 0; i < this.cart.length; i++) {
+                           if (this.cart[i] === id) {
+                               count++;
+                           }
+                       }
+                       return count
+                   },
+                   sortByPrice: function (priceArray) {
+                       function compare(a, b) {
+                           if (a.price > b.price)
+                               return 1;
+                           if (a.price < b.price)
+                               return -1;
+                           return 0;
+                       }
+                       return priceArray.sort(compare);
+                   },
+                   sortBySubject: function (titleArray) {
+                       function compare(a, b) {
+                           if (a.title > b.title)
+                               return 1;
+                           if (a.title < b.title)
+                               return -1;
+                           return 0;
+                       }
+                       return titleArray.sort(compare);
+                   },
+                   sortByLocation: function (locationArray) {
+                       function compare(a, b) {
+                           if (a.location > b.location)
+                               return 1;
+                           if (a.location < b.location)
+                               return -1;
+                           return 0;
+                       }
+                       return locationArray.sort(compare);
+                   },
+                   sortByAva: function (avaArray) {
+                       function compare(a, b) {
+                           if (a.availableInventory > b.availableInventory)
+                               return 1;
+                           if (a.availableInventory < b.availableInventory)
+                               return -1;
+                           return 0;
+                       }
+                       return avaArray.sort(compare);
+                   },
+                   filterLessons: function () {
+                       let tempLessons = this.subjects
+   
+                       tempLessons = tempLessons.filter((subject) => {
+                           return subject.title.toLowerCase().match(this.searchInput.toLowerCase()) || subject.location.toLowerCase().match(this.searchInput.toLowerCase())
+                       })
+                       if (this.sortBy == 'price') {
+                           tempLessons = this.sortByPrice(tempLessons)
+                       }
+                       else if (this.sortBy == 'subject') {
+                           tempLessons = this.sortBySubject(tempLessons)
+                       }
+                       else if (this.sortBy == 'location') {
+                           tempLessons = this.sortByLocation(tempLessons)
+                       }
+                       else if (this.sortBy == 'stock') {
+                           tempLessons = this.sortByAva(tempLessons)
+                       }
+   
+                       if (this.lowHigh == 'Ascending') {
+                           return tempLessons
+                       }
+                       else if (this.lowHigh == 'Descending') {
+                           return tempLessons.reverse()
+                       }
+                       return tempLessons
+                   }
+
+            },
+            computed: {
+                   cartItemCount: function () {
+                       return this.cart.length
+                   },
+               }
+    })
+</script>
+
+</body>
+</html>
